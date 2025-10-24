@@ -18,4 +18,5 @@ def show_info(title,mensaje):
     messagebox.showinfo(title,mensaje) 
 
 def question(titulo,pregunta):
-    messagebox.askquestion(title=titulo, message=pregunta)
+    return messagebox.askquestion(title=titulo, message=pregunta)
+

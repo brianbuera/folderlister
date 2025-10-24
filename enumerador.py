@@ -5,32 +5,43 @@ from validadores import validar_ruta
 from datetime import datetime
 
 
-def enumerar(directorio: Path):
+def obtener_camaras(directorio: Path):
     
-    eliminados = []
+    diccionario_videos = []
     rutas_videos = obtenerVideosOrdenados(directorio)
 
     for idx, dir in enumerate(rutas_videos):
-        carpeta= dir.parent
-        eliminar = carpeta.parent.parent
-        nuevo_nombre = directorio / f"{str(idx+1).zfill(2)} - {carpeta.name}"
+        a_eliminar = dir.parent.parent.parent
+        nuevo_nombre = directorio / f"{str(idx+1).zfill(2)} - {dir.parent.name}"
         
         if not nuevo_nombre.exists():
-            detalles(idx, dir, nuevo_nombre)
-            #carpeta.rename(nuevo_nombre)
-        if eliminar.is_dir() and eliminar.parent == directorio:
-            eliminados.append(eliminar)
+            if not (a_eliminar.is_dir() or a_eliminar == directorio):
+                return False
 
-    return True  
+            info_videos = obtenerInfo(idx ,dir , nuevo_nombre, a_eliminar)
+            
+            diccionario_videos.append(info_videos)
 
-def detalles(idx : int,dir : Path, nuevo_nombre : Path):
-    fecha_hora = obtenerHorario(dir.name).strftime("%H:%M %Y-%m-%d")
-    print(f"Directorio numero {idx+1}")
-    print(f"Ruta inicial: {str(dir)}")
-    print(f"Nuevo nombre: {str(nuevo_nombre)} - Hora y fecha: {fecha_hora}")
-    print(f"Nueva ruta del directorio: {str(nuevo_nombre)}")
-    print("")
+    return diccionario_videos  
 
+def detalles(diccionario : dict):
+    print(f"Orden:  {diccionario["orden"]}")
+    print(f"Ruta inicial: {diccionario["Ruta_inicial"]}")
+    print(f"Nueva ruta del directorio: {diccionario["nueva_ruta"]}")
+    print(f"Hora y fecha: {diccionario["hora_fecha"].strftime("%H:%M:%S %Y-%m-%d")}")
+    print("Se eliminará: ", {diccionario["para_eliminar"]},"\n")
+
+
+
+
+
+def obtenerInfo(idx : int,dir : Path, nuevo_nombre : Path, a_eliminar : Path):
+    fecha_hora = obtenerHorario(dir.name)
+    return {"orden" : idx+1,
+            "Ruta_inicial" : dir.parent,
+            "nueva_ruta" : nuevo_nombre,
+            "hora_fecha" : fecha_hora,
+            "para_eliminar": a_eliminar}
 
 def obtenerVideosOrdenados(directorio: Path):
     rutas = []

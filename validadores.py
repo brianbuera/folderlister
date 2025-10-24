@@ -3,8 +3,8 @@ import re
 pattern = re.compile(
     r'(?:[/\\])Exportar \d{2}-\d{2}-\d{4} \d{2}-\d{2}-\d{2}'
     r'(?:[/\\])Formato de reproductor de medios'
-    r'(?:[/\\])\d{3} - [A-Za-zÁÉÍÓÚáéíóúÑñ ]+'
-    r'(?:[/\\])\d{2}_\d{2}_\d{4} \d{2}_\d{2}_\d{2} \(UTC-[0-9]{2}_[0-9]{2}\)\.mkv$'
+    r'(?:[/\\])\d{3} - [A-Za-zÁÉÍÓÚáéíóúÑñ 0-9]+'
+    r'(?:[/\\])\d{2}_\d{2}_\d{4} \d{2}_\d{2}_\d{2} \(UTC-[0-9]{2}_[0-9]{2}\)\.(mkv|mp4)$'
 )
 
 def validar_ruta(directorio):
@@ -13,7 +13,7 @@ def validar_ruta(directorio):
     Muestra mensajes de error detallados si alguna ruta falla.
     """
 
-    rutas_videos = list(directorio.rglob("*.mkv"))
+    rutas_videos = list(directorio.rglob("*.mkv")) + list(directorio.rglob("*.mp4"))
     if not rutas_videos:
         print("❌ No se encontraron videos .mkv en el directorio.")
         return False

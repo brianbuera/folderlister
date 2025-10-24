@@ -1,0 +1,4 @@
+*.pyc
+test_enumerar/
+test_enumerador.py
+venv/
