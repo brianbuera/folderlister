@@ -1,33 +1,16 @@
-from tkinter import filedialog
-from pathlib import Path
-from enumerador import obtener_camaras
+from funciones import obtener_camaras
 from mensajes import *
-from validadores import validar_ruta
-from tabla import ReorderableTreeview
+from interfaz import ListaDeCamaras
+from seleccionar_directorio import seleccionar_directorio
 
 if __name__ == "__main__":
-
-    directorio : Path = Path(filedialog.askdirectory())
-
-    if not directorio != Path("."):
-        show_error(NO_SELECCIONADO)
-        exit()       
-
-    if not any(directorio.iterdir()):
-        show_error(VACIO)
+    directorio =  seleccionar_directorio()
+    if not directorio:
         exit()
-    
-    if not validar_ruta(directorio):
-        show_error(NO_CUMPLE_REQUISTOS)
-        exit()
-    
-    nuevos_directorios = obtener_camaras(directorio)
-
-    print(bool(nuevos_directorios))
-
-
-    app = ReorderableTreeview(nuevos_directorios)
-    
+    directorios_camaras = obtener_camaras(directorio)
+    app = ListaDeCamaras(directorios_camaras)
+    app.geometry("600x400")
+    app.attributes('-topmost',True)
     app.mainloop()
     
 

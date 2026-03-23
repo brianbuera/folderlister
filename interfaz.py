@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from mensajes import question
-class ReorderableTreeview(tk.Tk):
+class ListaDeCamaras(tk.Tk):
     def __init__(self, nuevos_directorios):
         super().__init__()
         self.title("Treeview Reordenable (Drag & Drop)")
@@ -33,6 +33,9 @@ class ReorderableTreeview(tk.Tk):
 
         # 5. Botón de ejemplo para obtener selección
         ttk.Button(self, text="Confirmar", command=self.enumerar).pack(pady=5)
+        ttk.Button(self, text="Actualizar").pack(pady=5)
+        ttk.Button(self, text="Eliminar").pack(pady=5)
+        ttk.Button(self, text="Copiar en portapapeles", command=self.copiar_listbox).pack(pady=5)
 
         self.cargar_camaras()
 
@@ -70,7 +73,7 @@ class ReorderableTreeview(tk.Tk):
 
     
     def on_drop(self, event):
-# 2. Si el ratón está sobre una fila válida diferente
+        #Si el ratón está sobre una fila válida diferente
         if self.target_row and self.target_row != self.drag_item:
             
             # Obtener la lista de todos los IDs para calcular el nuevo índice
@@ -80,36 +83,27 @@ class ReorderableTreeview(tk.Tk):
             except ValueError:
                 # El target_row no está en la lista principal (no debería pasar aquí)
                 return
-            
+            '''
+            SECCION DE ACTUALIZACION DE LA LISTA DE CAMARAS EN FORMATO DICCIONARIO
+            '''
+            #obtengo ruta origen y ruta destino
             ruta_seleccionada = self.camaras[self.drag_index]["nueva_ruta"]
             ruta_target = self.camaras[self.target_index]["nueva_ruta"]
-
+            #Intercambio numeros de orden en los nombres
             self.camaras[self.drag_index]["nueva_ruta"] = ruta_seleccionada.parent / f"{str(self.target_index+1).zfill(2)} - {ruta_seleccionada.name[5:]}"
-            print(self.camaras[self.drag_index]["nueva_ruta"])
             self.camaras[self.target_index]["nueva_ruta"] = ruta_target.parent / f"{str(self.drag_index+1).zfill(2)} - {ruta_target.name[5:]}"
-            print(self.camaras[self.target_index]["nueva_ruta"])
+            #Intercambio numeros de orden en los ordenes
             self.camaras[self.drag_index]["orden"] = self.target_index + 1
             self.camaras[self.target_index]["orden"] = self.drag_index + 1
+            #Intercambio los lugares en la lista de camaras 
             self.camaras[self.drag_index],self.camaras[self.target_index] = self.camaras[self.target_index],self.camaras[self.drag_index]
-
-            # Si el arrastre es hacia arriba
-            if self.target_index < self.drag_index:
-                new_position = self.target_index # Mover arriba del target
-
-            # Si el arrastre es hacia abajo
-            else:
-                new_position = self.target_index + 1 # Mover abajo del target
-
-            # Mover el ítem seleccionado a la nueva posición
-            self.tree.move(self.drag_item, '', new_position)
-            
-            # Actualizar el índice de arrastre para reflejar el nuevo orden
-            self.drag_index = new_position if new_position < len(children) else len(children) - 1
-
-        """Finaliza la operación de arrastre."""
+           
+        """reinicio los datos"""
         self.drag_item = None
         self.drag_index = None
         self.target_index = None
+
+        #VUELVO A CARGAR LA INTERFAZ CON LOS LOS DATOS ACTUALIZADOS
         self.cargar_camaras()
 
 
@@ -135,3 +129,15 @@ class ReorderableTreeview(tk.Tk):
                 dir["Ruta_inicial"].rename(dir["nueva_ruta"])
 
         pass
+
+    def copiar_listbox(self):
+        filas = []
+
+        for item in self.tree.get_children():
+            valores = self.tree.item(item, "values")
+            filas.append("\t".join(map(str, valores)))
+
+        texto = "\n".join(filas)
+
+        self.clipboard_clear()
+        self.clipboard_append(texto)
